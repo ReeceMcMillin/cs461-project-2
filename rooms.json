@@ -1,0 +1,11 @@
+[
+  { "name": "Katz 003", "capacity": 45 },
+  { "name": "FH 216", "capacity": 30 },
+  { "name": "Royall 206", "capacity": 75 },
+  { "name": "Royall 201", "capacity": 50 },
+  { "name": "FH 310", "capacity": 108 },
+  { "name": "Haag 201", "capacity": 60 },
+  { "name": "Haag 301", "capacity": 75 },
+  { "name": "MNLC 325", "capacity": 450 },
+  { "name": "Bloch 119", "capacity": 60 }
+]
