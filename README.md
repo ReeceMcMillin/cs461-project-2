@@ -6,11 +6,12 @@ Python doesn't specify explicit semantics for how a lot of operations should be 
 
 # Sample Output
 
+```
 [09:44] pop-os:program2 (main *%) | python3.10 main.py
-20s  Sun 30 Oct 2022 09:44:16 AM CDT
+20s < Sun 30 Oct 2022 09:44:16 AM CDT
 
 +-----------------+-------------------+---------+
-+    generation   +  worst  | average |  best   +
+|    generation   |  worst  | average |  best   |
 +-----------------+-------------------+---------+
 | generation 000: |  1.300  |  3.241  |  8.300  |
 +-----------------+-------------------+---------+
@@ -52,3 +53,4 @@ Fitness Breakdown
 +8.80: Sum of the total fitness of all individual courses.
 -----------------
 Total fitness: 12.50
+```
