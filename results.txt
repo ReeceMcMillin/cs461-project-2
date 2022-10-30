@@ -1,0 +1,26 @@
+CS101A (✓)       Hare        FH 310   50/108  (2.16) 11:00 (fitness:  0.80)
+CS101B (✓)   Zein el Din    Haag 201   50/60  (1.20) 13:00 (fitness:  0.80)
+CS191A (✓)       Hare      Bloch 119   50/60  (1.20) 12:00 (fitness:  0.80)
+CS191B (✓)     Gharibi     Royall 206  50/75  (1.50) 10:00 (fitness:  0.80)
+CS201  (✓)       Shah        FH 310   50/108  (2.16) 12:00 (fitness:  0.80)
+CS291  (✓)     Gharibi     Royall 201  50/50  (1.00) 11:00 (fitness:  0.80)
+CS303  (✓)   Zein el Din   Royall 206  60/75  (1.25) 14:00 (fitness:  0.80)
+CS304  (✓)        Xu       Royall 201  25/50  (2.00) 12:00 (fitness:  0.80)
+CS394  (✓)       Song       Katz 003   20/45  (2.25) 11:00 (fitness:  0.80)
+CS449  (✓)        Xu       Royall 206  60/75  (1.25) 11:00 (fitness:  0.80)
+CS451  (✓)       Song        FH 310   100/108 (1.08) 10:00 (fitness:  0.80)
+
+Fitness Breakdown
+-----------------
++0.50: CS101A and CS191A are consecutive and not far apart.
++0.50: CS101A and CS191B are consecutive and not far apart.
++0.50: CS101B and CS191A are consecutive and not far apart.
++0.20: Gharibi teaches consecutive courses close to each other.
++0.20: Song teaches consecutive courses close to each other.
++0.20: Hare teaches consecutive courses close to each other.
++0.20: Xu teaches consecutive courses close to each other.
++0.20: Zein el Din teaches consecutive courses close to each other.
++2.20: From instructors without timeslot conflicts.
++8.80: Sum of the total fitness of all individual courses.
+-----------------
+Total fitness: 13.50

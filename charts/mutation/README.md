@@ -1,0 +1,1 @@
+Each subfolder is named for the population size. The trailing decimal in the filename represents the mutation rate.

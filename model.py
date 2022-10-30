@@ -11,6 +11,7 @@ from util import random_instructor
 
 @dataclass(frozen=True)
 class Explanation:
+    """The cost and explanation associated with an incentive or penalty, used in fitness output."""
     amount: float
     text: str
 
@@ -19,6 +20,7 @@ class Explanation:
 
 @dataclass(frozen=True)
 class Room:
+    """A particular room on campus."""
     name: str
     capacity: int
 
@@ -35,6 +37,7 @@ class Room:
 
 @dataclass(frozen=True)
 class Course:
+    """Metadata associated with a particular course."""
     name: str
     section: Optional[str]
     expected_enrollment: int
@@ -54,6 +57,7 @@ class Course:
 
 @dataclass(frozen=True)
 class ScheduledCourse:
+    """Metadata associated with a scheduling decision for a particular course."""
     course: Course
     instructor: str
     room: Room
@@ -67,6 +71,7 @@ class ScheduledCourse:
     ]
 
     def __str__(self) -> str:
+        """Pretty-print representation for more human-readable output."""
         return f"""{str(self.course.name) + str(self.course.section or ' ')} \
 ({'✓' if self.has_preferred_instructor else 'X'}) {self.instructor:^16}\
 {self.room.name:^10} {str(self.course.expected_enrollment) + '/' + str(self.room.capacity):^7} ({self.capacity_to_enrollment_ratio:<4.2f}) \
@@ -94,6 +99,7 @@ class ScheduledCourse:
         return self.room_and_time == other.room_and_time
 
     def mutate(self, room_list: List[Room], rate=0.01) -> "ScheduledCourse":
+        """Returns a new ScheduledCourse object with potentially mutated properties."""
         instructor = self.instructor
         room = self.room
         start_time: Literal[10, 11, 12, 13, 14, 15] = self.start_time
@@ -153,7 +159,7 @@ class Schedule(List[ScheduledCourse]):
     def instructor_total_courses(self) -> Counter[str]:
         return Counter([course.instructor for course in self if course.instructor != "Xu"])
 
-    @property
+    @cached_property
     def fitness(self):
         self.explanations: List[Explanation] = []
         course_specific = 0
@@ -161,6 +167,12 @@ class Schedule(List[ScheduledCourse]):
         cs101a, cs101b = self[0], self[1]
         cs191a, cs191b = self[2], self[3]
 
+        # ----------------------------------------------------------------------------------------
+        # Penalize schedules that start different sections of CS101/CS191 (A vs B) at the same time.
+        # Incentivize schedules that separate sections by at least 4 hours.
+        # 
+        # I apologize for the code density in this section, didn't have as much time to find a better strategy.
+        # ----------------------------------------------------------------------------------------
         if cs101a.start_time == cs101b.start_time:
             course_specific -= 0.5
             self.explanations.append(Explanation(-0.5, "CS101A and CS101B share a timeslot."))
@@ -175,6 +187,11 @@ class Schedule(List[ScheduledCourse]):
             course_specific += 0.5
             self.explanations.append(Explanation(0.5, "CS191A and CS191B are more than 4 hours apart."))
 
+        # ----------------------------------------------------------------------------------------
+        # Penalize schedules that cause students to have to walk across campus in 10 minutes.
+        # Incentivize schedules that don't.
+        # ----------------------------------------------------------------------------------------
+        
         for cs101 in (cs101a, cs101b):
             for cs191 in (cs191a, cs191b):
                 if abs(cs101.start_time - cs191.start_time) == 1:
@@ -195,6 +212,30 @@ class Schedule(List[ScheduledCourse]):
                 case 2:
                     course_specific += 0.25
                     self.explanations.append(Explanation(0.25, f"CS101{section} and CS191{section} are separated by exactly one hour."))
+        
+        # ----------------------------------------------------------------------------------------
+        # Penalize schedules that cause instructors to have to walk across campus in 10 minutes.
+        #
+        # NOTE: the original fitness values seems to mess with the other incentives pretty heavily.
+        #   - I lowered the bonus from 0.5 to 0.2. This seems to do a better job at balancing out.
+        # ----------------------------------------------------------------------------------------
+        sorted_starts = sorted(self, key=lambda c: c.start_time)
+        grouped = groupby(sorted_starts, key=lambda c: c.start_time)
+        starts = {start: [course for course in group] for start, group in grouped}
+        for hour in starts:
+            if hour == 15:
+                break # No courses follow hour 15, so we don't need to consider it.
+            for course in starts[hour]:
+                for following in starts.get(hour + 1) or []:
+                    if course.instructor == following.instructor:
+                        match (course.room.name, following.room.name):
+                            case ("Bloch", "Katz") | ("Katz", "Bloch"):
+                                course_specific -= 0.4
+                                self.explanations.append(Explanation(-0.4, f"{course.instructor} teaches consecutive courses, but on opposite ends of campus."))
+                            case _:
+                                course_specific += 0.2
+                                self.explanations.append(Explanation(0.2, f"{course.instructor} teaches consecutive courses close to each other."))
+ 
         
         # ----------------------------------------------------------------------------------------
         # Give bonus fitness to schedules with exactly one timeslot per professor (no conflicts).
